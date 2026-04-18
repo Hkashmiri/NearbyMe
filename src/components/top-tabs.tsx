@@ -2,18 +2,23 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { UserMenu } from "@/components/auth-shell";
 
 const TABS = [
-  { href: "/?tab=events",  label: "Events",    tab: "events"  },
-  { href: "/?tab=news",    label: "Local News", tab: "news"    },
-  { href: "/?tab=history", label: "History",    tab: "history" },
+  { href: "/?tab=events",  label: "Events",    id: "events"  },
+  { href: "/?tab=news",    label: "Local News", id: "news"    },
+  { href: "/?tab=history", label: "History",    id: "history" },
+  { href: "/social",       label: "URLs",      id: "urls"     },
 ] as const;
 
 export function TopTabs() {
+  const pathname = usePathname();
   const searchParams = useSearchParams();
-  const active = searchParams.get("tab") ?? "events";
+  const active =
+    pathname === "/"
+      ? searchParams.get("tab") ?? "events"
+      : pathname.replace(/^\//, "");
 
   return (
     <header className="sticky top-0 z-40 border-b border-white/10 bg-slate-950/60 backdrop-blur">
@@ -30,13 +35,13 @@ export function TopTabs() {
         </div>
 
         <nav className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 p-1">
-          {TABS.map(({ href, label, tab }) => (
+          {TABS.map(({ href, label, id }) => (
             <Link
-              key={tab}
+              key={id}
               href={href}
               className={[
                 "rounded-full px-4 py-2 text-sm font-semibold transition",
-                active === tab
+                active === id
                   ? "bg-slate-200/10 text-sky-300 shadow-sm"
                   : "text-sky-300 hover:bg-white/8 hover:text-sky-100",
               ].join(" ")}
