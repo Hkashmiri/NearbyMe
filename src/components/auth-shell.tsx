@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { db } from "@/lib/db";
+import { TopTabs } from "@/components/top-tabs";
 
 export function AuthShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -39,7 +40,12 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
     return null;
   }
 
-  return <>{children}</>;
+  return (
+    <>
+      {pathname !== "/login" ? <TopTabs /> : null}
+      {children}
+    </>
+  );
 }
 
 export function UserMenu() {

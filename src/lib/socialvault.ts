@@ -79,7 +79,9 @@ function buildNewsQuery(input: DiscoveryInput) {
     .join(" ");
 }
 
-async function fetchNewsApiEvents(input: DiscoveryInput): Promise<NormalizedEventInput[]> {
+export async function fetchNewsApiEvents(
+  input: DiscoveryInput,
+): Promise<NormalizedEventInput[]> {
   const apiKey = process.env.NEWS_API_KEY;
   if (!apiKey) {
     return [];
