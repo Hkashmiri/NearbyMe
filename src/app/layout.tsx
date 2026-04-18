@@ -27,8 +27,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${spaceGrotesk.variable} ${plexMono.variable} antialiased`}>
-        <AuthShell>{children}</AuthShell>
+      <body
+        className={`${spaceGrotesk.variable} ${plexMono.variable} antialiased`}
+      >
+        <AuthShell>
+          {children}
+        </AuthShell>
       </body>
     </html>
   );
