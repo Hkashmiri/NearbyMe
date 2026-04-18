@@ -215,7 +215,7 @@ export function EventMap({
             {error
               ? error
               : origin
-                ? `Travel origin: ${origin.label}`
+                ? `Travel origin:`
                 : "Enter a city or state, or enable location access to calculate travel times."}
           </p>
           {selectedEvent ? (

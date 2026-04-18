@@ -14,6 +14,20 @@ type TravelInfo = {
   error?: string;
 };
 
+function haversineMiles(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
+  const toRad = (value: number) => (value * Math.PI) / 180;
+  const R = 3958.8;
+  const dLat = toRad(b.lat - a.lat);
+  const dLng = toRad(b.lng - a.lng);
+  const lat1 = toRad(a.lat);
+  const lat2 = toRad(b.lat);
+  const sinDLat = Math.sin(dLat / 2);
+  const sinDLng = Math.sin(dLng / 2);
+  const h =
+    sinDLat * sinDLat + Math.cos(lat1) * Math.cos(lat2) * (sinDLng * sinDLng);
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+
 function sortEvents(events: EventRecord[]) {
   return [...events].sort((left, right) => {
     const leftStartsAt = left.startsAt ?? Number.MAX_SAFE_INTEGER;
@@ -65,6 +79,22 @@ export default function HomePage() {
     events.find((event) => event.id === selectedEventId) ?? events[0] ?? null;
   const effectiveOrigin =
     searchOrigin ?? (deviceLocation ? { ...deviceLocation, label: "Your current location" } : null);
+
+  const closestEvent = useMemo(() => {
+    if (!deviceLocation) return null;
+    let best: { event: EventRecord; miles: number } | null = null;
+    for (const event of events) {
+      if (typeof event.latitude !== "number" || typeof event.longitude !== "number") continue;
+      const miles = haversineMiles(
+        deviceLocation,
+        { lat: event.latitude, lng: event.longitude },
+      );
+      if (!best || miles < best.miles) {
+        best = { event, miles };
+      }
+    }
+    return best;
+  }, [deviceLocation, events]);
 
   useEffect(() => {
     if (!selectedEventId && events[0]) {
@@ -143,6 +173,31 @@ export default function HomePage() {
           isRefreshing={isRefreshing}
           locationStatus={locationStatus}
         />
+
+        {closestEvent ? (
+          <button
+            type="button"
+            onClick={() => setSelectedEventId(closestEvent.event.id)}
+            className="group flex items-center justify-between gap-4 rounded-[22px] border border-sky-300/25 bg-sky-300/10 px-5 py-4 text-left transition hover:border-sky-200/35 hover:bg-sky-300/15"
+          >
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.32em] text-sky-200/80">
+                Closest to you
+              </p>
+              <p className="mt-1 text-sm font-semibold text-white">
+                {closestEvent.event.title}
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="rounded-full border border-white/10 bg-slate-950/40 px-3 py-1 text-xs font-semibold text-slate-100">
+                {closestEvent.miles < 0.1 ? "< 0.1" : closestEvent.miles.toFixed(1)} mi
+              </span>
+              <span className="text-sm text-sky-100/80 transition group-hover:text-sky-50">
+                View →
+              </span>
+            </div>
+          </button>
+        ) : null}
 
         <section className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
           <div className="order-2 flex min-h-[60vh] flex-col overflow-hidden rounded-[28px] border border-white/10 bg-slate-950/70 xl:order-1">

@@ -3,9 +3,9 @@ import { fetchNewsApiEvents } from "@/lib/socialvault";
 import { type DiscoveryInput } from "@/types/events";
 
 function defaultDates() {
-  const start = new Date();
   const end = new Date();
-  end.setDate(end.getDate() + 7);
+  const start = new Date(end);
+  start.setDate(start.getDate() - 7);
 
   return {
     startDate: start.toISOString().slice(0, 10),

@@ -23,6 +23,23 @@ function getResults(payload: SociaVaultSearchEnvelope): SociaVaultSearchResult[]
     return payload as SociaVaultSearchResult[];
   }
 
+  const payloadRecord = payload as Record<string, unknown>;
+  const nestedData = payloadRecord.data;
+  if (nestedData && typeof nestedData === "object" && !Array.isArray(nestedData)) {
+    const nestedResults = (nestedData as Record<string, unknown>).results;
+    if (nestedResults && typeof nestedResults === "object" && !Array.isArray(nestedResults)) {
+      return Object.values(nestedResults as Record<string, unknown>).map((item) => {
+        const record = (item ?? {}) as Record<string, unknown>;
+        return {
+          title: typeof record.title === "string" ? record.title : undefined,
+          link: typeof record.url === "string" ? record.url : undefined,
+          snippet: typeof record.description === "string" ? record.description : undefined,
+          source: typeof record.source === "string" ? record.source : undefined,
+        } satisfies SociaVaultSearchResult;
+      });
+    }
+  }
+
   const candidates = [
     payload.results,
     payload.organic_results,
@@ -48,7 +65,7 @@ function dedupe(results: SociaVaultSearchResult[]) {
 
 async function fetchSearchResults(query: string, apiKey: string) {
   const url = new URL(SOCIAVAULT_GOOGLE_SEARCH_URL);
-  url.searchParams.set("q", query);
+  url.searchParams.set("query", query);
   url.searchParams.set("num", "5");
   url.searchParams.set("gl", "us");
   url.searchParams.set("hl", "en");
@@ -87,17 +104,20 @@ export async function fetchNewsApiEvents(
     return [];
   }
 
+  const today = new Date();
+  const todayISO = today.toISOString().slice(0, 10);
+  const past = new Date(today);
+  past.setDate(past.getDate() - 7);
+  const pastISO = past.toISOString().slice(0, 10);
+
   const url = new URL(NEWS_API_EVERYTHING_URL);
   url.searchParams.set("q", buildNewsQuery(input));
   url.searchParams.set("language", "en");
   url.searchParams.set("sortBy", "publishedAt");
   url.searchParams.set("pageSize", "8");
-  if (input.startDate) {
-    url.searchParams.set("from", input.startDate);
-  }
-  if (input.endDate) {
-    url.searchParams.set("to", input.endDate);
-  }
+  // NewsAPI "everything" expects dates in the past; clamp any future "to" date.
+  url.searchParams.set("from", input.startDate || pastISO);
+  url.searchParams.set("to", input.endDate && input.endDate < todayISO ? input.endDate : todayISO);
 
   const response = await fetch(url, {
     headers: {
