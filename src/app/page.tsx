@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
+import { ChatWorkspace } from "@/components/chat-workspace";
 import { DiscoveryPanel } from "@/components/discovery-panel";
 import { EventCard } from "@/components/event-card";
 import { EventMap } from "@/components/event-map";
@@ -201,6 +202,8 @@ export default function HomePage() {
             />
           </div>
         </section>
+
+        <ChatWorkspace eventsCount={events.length} />
       </div>
     </main>
   );

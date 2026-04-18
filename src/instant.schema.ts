@@ -31,6 +31,19 @@ const _schema = i.schema({
       importedAt: i.number(),
       updatedAt: i.number(),
     }),
+    chats: i.entity({
+      ownerId: i.string().indexed(),
+      title: i.string(),
+      createdAt: i.number(),
+      updatedAt: i.number(),
+    }),
+    messages: i.entity({
+      ownerId: i.string().indexed(),
+      chatId: i.string().indexed(),
+      role: i.string(),
+      content: i.string(),
+      createdAt: i.number(),
+    }),
   },
   links: {
     $usersLinkedPrimaryUser: {

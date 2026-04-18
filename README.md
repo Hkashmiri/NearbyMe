@@ -7,6 +7,8 @@ NearbyMe is a Next.js app that uses SociaVault, NewsAPI, Gemini, Google Maps, an
 - Searches for free local events using preset AI prompt styles inspired by "Everyday AI Hacks"
 - Supplements the event feed with local-news article discovery from NewsAPI
 - Lets users enter a city or state instead of sharing live GPS
+- Supports passwordless login with Instant magic codes
+- Saves multiple personal chats in InstantDB and lets users create and delete them
 - Syncs discovered events into InstantDB in realtime
 - Uses Gemini to classify whether events are free, ticketed, or RSVP-based
 - Uses Google Maps to show event pins, distance, and drive time from the chosen origin
@@ -39,4 +41,5 @@ If Next's dev server throws `ENOENT` errors for files inside `.next/static/devel
 ## Notes
 
 - The app uses SociaVault's Google search scraping endpoint as the event discovery source, then structures results into event records for InstantDB.
+- The app uses Instant's magic code auth flow (email → code → verify). Ensure magic code auth is enabled for your Instant app in the dashboard.
 - If SociaVault or Gemini credentials are unavailable, the UI still works with demo events and fallback inference.
