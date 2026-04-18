@@ -210,20 +210,7 @@ export function EventMap({
       </div>
       <div className="relative flex-1">
         <div ref={mapRef} className="absolute inset-0" />
-        <div className="absolute inset-x-4 top-4 rounded-[20px] border border-white/10 bg-slate-950/80 p-4 backdrop-blur">
-          <p className="text-sm text-slate-200">
-            {error
-              ? error
-              : origin
-                ? `Travel origin:`
-                : "Enter a city or state, or enable location access to calculate travel times."}
-          </p>
-          {selectedEvent ? (
-            <p className="mt-2 text-xs uppercase tracking-[0.24em] text-slate-500">
-              {selectedEvent.venueName || selectedEvent.address || "Location TBD"}
-            </p>
-          ) : null}
-        </div>
+        
       </div>
     </div>
   );
