@@ -196,7 +196,7 @@ export function EventMap({
   const selectedEvent = events.find((event) => event.id === selectedEventId) ?? null;
 
   return (
-    <div className="flex h-full min-h-[60vh] flex-col">
+    <div className="flex h-full min-h-[20vh] flex-col">
       <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
         <div>
           <h2 className="text-lg font-semibold text-white">Map View</h2>
