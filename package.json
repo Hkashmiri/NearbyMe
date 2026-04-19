@@ -3,18 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "ulimit -n 10000 && WATCHPACK_POLLING=true next dev -H 127.0.0.1",
+    "dev": "cross-env WATCHPACK_POLLING=true next dev -H 127.0.0.1",
     "build": "next build",
     "start": "next start -H 127.0.0.1",
     "lint": "next lint",
-    "clean": "rm -rf .next"
+    "clean": "rimraf .next"
   },
   "dependencies": {
     "@google/genai": "^1.50.1",
     "@googlemaps/js-api-loader": "^2.0.2",
     "@instantdb/admin": "latest",
     "@instantdb/react": "latest",
-    "next": "15.4.10",
+    "next": "^15.5.15",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
@@ -24,6 +24,8 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cross-env": "^7.0.3",
+    "rimraf": "^5.0.0",
     "tailwindcss": "^4",
     "typescript": "^5.9.3"
   },

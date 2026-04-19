@@ -376,3 +376,82 @@ function inferPlatform(link?: string) {
     return "web";
   }
 }
+
+export async function analyzeUrlContent(text: string, sourceUrl?: string) {
+  const ai = getClient();
+
+  if (!ai) {
+    return {
+      title: "Untitled Event",
+      description: text.slice(0, 200) + "...",
+      location: "Unknown",
+      date: "Unknown",
+      price: "Unknown",
+      whatHappens: "Unknown",
+      otherDetails: "AI analysis unavailable",
+    };
+  }
+
+  try {
+    let promptText = "Extract event information from this webpage. Return strict JSON with keys: title, description, location, date, price, whatHappens, otherDetails. Be concise and accurate. If information is not available, use 'Unknown'.";
+
+    if (sourceUrl) {
+      promptText += `\n\nSource URL: ${sourceUrl}`;
+    }
+
+    if (text.trim()) {
+      promptText += `\n\nPage content:\n${text.slice(0, 10000)}`;
+    } else if (sourceUrl) {
+      // If we don't have content but have a URL, ask Gemini to infer from URL structure
+      promptText += `\n\nURL: ${sourceUrl}\n\nNote: This appears to be a social media or event URL. Based on the URL structure and common patterns for this platform, extract any event information that might be implied by the URL path, parameters, or known platform conventions.`;
+    }
+
+    const response = await ai.models.generateContent({
+      model,
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              text: promptText,
+            },
+          ],
+        },
+      ],
+    });
+
+    const responseText = response.text?.trim();
+    const parsed = responseText
+      ? (JSON.parse(responseText.replace(/^```json\s*|\s*```$/g, "")) as {
+          title?: string;
+          description?: string;
+          location?: string;
+          date?: string;
+          price?: string;
+          whatHappens?: string;
+          otherDetails?: string;
+        })
+      : {};
+
+    return {
+      title: parsed.title || "Untitled Event",
+      description: parsed.description || text.slice(0, 200) + "..." || "No description available",
+      location: parsed.location || "Unknown",
+      date: parsed.date || "Unknown",
+      price: parsed.price || "Unknown",
+      whatHappens: parsed.whatHappens || "Unknown",
+      otherDetails: parsed.otherDetails || "No additional details",
+    };
+  } catch (error) {
+    console.error("Error analyzing URL content:", error);
+    return {
+      title: "Error",
+      description: "Failed to analyze content",
+      location: "Unknown",
+      date: "Unknown",
+      price: "Unknown",
+      whatHappens: "Unknown",
+      otherDetails: "Analysis failed",
+    };
+  }
+}

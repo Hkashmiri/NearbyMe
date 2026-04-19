@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
 import { discoveryPresets } from "@/lib/discovery-presets";
 import { type DiscoveryInput, type DiscoveryPresetId } from "@/types/events";
 
@@ -20,6 +21,117 @@ export function DiscoveryPanel({
   isRefreshing,
   locationStatus,
 }: DiscoveryPanelProps) {
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [filteredCities, setFilteredCities] = useState<string[]>([]);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const popularCities = [
+    "New York, NY",
+    "Los Angeles, CA",
+    "Chicago, IL",
+    "Houston, TX",
+    "Phoenix, AZ",
+    "Philadelphia, PA",
+    "San Antonio, TX",
+    "San Diego, CA",
+    "Dallas, TX",
+    "San Jose, CA",
+    "Austin, TX",
+    "Jacksonville, FL",
+    "Fort Worth, TX",
+    "Columbus, OH",
+    "Charlotte, NC",
+    "San Francisco, CA",
+    "Indianapolis, IN",
+    "Seattle, WA",
+    "Denver, CO",
+    "Boston, MA",
+    "El Paso, TX",
+    "Nashville, TN",
+    "Detroit, MI",
+    "Oklahoma City, OK",
+    "Portland, OR",
+    "Las Vegas, NV",
+    "Memphis, TN",
+    "Louisville, KY",
+    "Baltimore, MD",
+    "Milwaukee, WI",
+    "Albuquerque, NM",
+    "Tucson, AZ",
+    "Fresno, CA",
+    "Sacramento, CA",
+    "Mesa, AZ",
+    "Kansas City, MO",
+    "Atlanta, GA",
+    "Long Beach, CA",
+    "Colorado Springs, CO",
+    "Raleigh, NC",
+    "Miami, FL",
+    "Virginia Beach, VA",
+    "Omaha, NE",
+    "Oakland, CA",
+    "Minneapolis, MN",
+    "Tulsa, OK",
+    "Arlington, TX",
+    "Tampa, FL",
+    "New Orleans, LA",
+    "Wichita, KS",
+  ];
+
+  const handleLocationChange = (value: string) => {
+    onChange({ location: value });
+    setSelectedIndex(-1);
+
+    if (value.length > 0) {
+      const filtered = popularCities.filter(city =>
+        city.toLowerCase().includes(value.toLowerCase())
+      ).slice(0, 5);
+      setFilteredCities(filtered);
+      setShowSuggestions(filtered.length > 0);
+    } else {
+      setShowSuggestions(false);
+    }
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (!showSuggestions) return;
+
+    switch (event.key) {
+      case "ArrowDown":
+        event.preventDefault();
+        setSelectedIndex(prev =>
+          prev < filteredCities.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case "ArrowUp":
+        event.preventDefault();
+        setSelectedIndex(prev => prev > 0 ? prev - 1 : -1);
+        break;
+      case "Enter":
+        event.preventDefault();
+        if (selectedIndex >= 0 && selectedIndex < filteredCities.length) {
+          handleSuggestionClick(filteredCities[selectedIndex]);
+        }
+        break;
+      case "Escape":
+        setShowSuggestions(false);
+        setSelectedIndex(-1);
+        break;
+    }
+  };
+
+  const handleSuggestionClick = (city: string) => {
+    onChange({ location: city });
+    setShowSuggestions(false);
+    inputRef.current?.focus();
+  };
+
+  const handleInputBlur = () => {
+    // Delay hiding suggestions to allow click events
+    setTimeout(() => setShowSuggestions(false), 150);
+  };
+
   const activePreset =
     discoveryPresets.find((preset) => preset.id === form.presetId) ?? discoveryPresets[0];
 
@@ -77,14 +189,44 @@ export function DiscoveryPanel({
               </p>
             </div>
 
-            <label className="block">
+            <label className="block relative">
               <span className="mb-2 block text-sm text-slate-300">City or State</span>
               <input
+                ref={inputRef}
                 value={form.location}
-                onChange={(event) => onChange({ location: event.target.value })}
+                onChange={(event) => handleLocationChange(event.target.value)}
+                onKeyDown={handleKeyDown}
+                onFocus={() => {
+                  if (form.location.length > 0) {
+                    const filtered = popularCities.filter(city =>
+                      city.toLowerCase().includes(form.location.toLowerCase())
+                    ).slice(0, 5);
+                    setFilteredCities(filtered);
+                    setShowSuggestions(filtered.length > 0);
+                  }
+                }}
+                onBlur={handleInputBlur}
                 placeholder="Sacramento, CA"
                 className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none ring-0 placeholder:text-slate-500"
               />
+              {showSuggestions && (
+                <div className="absolute top-full left-0 right-0 z-10 mt-1 rounded-2xl border border-white/10 bg-slate-950/95 backdrop-blur shadow-lg">
+                  {filteredCities.map((city, index) => (
+                    <button
+                      key={city}
+                      type="button"
+                      onClick={() => handleSuggestionClick(city)}
+                      className={`w-full px-4 py-3 text-left text-sm first:rounded-t-2xl last:rounded-b-2xl ${
+                        index === selectedIndex
+                          ? "bg-amber-300/20 text-amber-200"
+                          : "text-slate-300 hover:bg-white/10 hover:text-white"
+                      }`}
+                    >
+                      {city}
+                    </button>
+                  ))}
+                </div>
+              )}
             </label>
 
             <label className="block">
