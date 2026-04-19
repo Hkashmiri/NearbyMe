@@ -47,10 +47,10 @@ export function SocialMediaPanel() {
         <div>
           <h1 className="text-3xl font-semibold text-white">Social Media Event Discovery</h1>
           <p className="mt-2 text-slate-300">
-            Paste URLs from social media posts, event pages, or any web content. AI will analyze them to extract event details like location, date, price, and description.
+            Paste URLs from Instagram, Facebook, X, YouTube, Google, or other public event pages so AI can extract event details.
           </p>
           <p className="mt-2 text-sm text-slate-400">
-            Works with Instagram posts, Facebook events, X/Twitter threads, YouTube videos, Eventbrite pages, and more.
+            Supported URLs include public posts, reels, events, videos, and listings from social media and event platforms.
           </p>
         </div>
 
@@ -60,11 +60,7 @@ export function SocialMediaPanel() {
             <textarea
               value={urls}
               onChange={(e) => setUrls(e.target.value)}
-              placeholder={`https://instagram.com/p/example-post
-https://facebook.com/events/example-event
-https://x.com/username/status/example-tweet
-https://youtube.com/watch?v=example-video
-https://www.eventbrite.com/e/example-event`}
+              placeholder="https://instagram.com/p/example&#10;https://facebook.com/events/example"
               className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white outline-none ring-0 placeholder:text-slate-500 min-h-[120px]"
             />
           </label>
