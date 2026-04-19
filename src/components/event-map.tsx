@@ -55,7 +55,7 @@ export function EventMap({
         mapInstanceRef.current = new maps.Map(mapRef.current, {
           center: origin ?? { lat: 38.5816, lng: -121.4944 },
           disableDefaultUI: true,
-          zoom: 11,
+          zoom: 9,
           styles: [
             {
               featureType: "all",
